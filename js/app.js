@@ -4,7 +4,7 @@ const App = {
     currentPage: 1,
     itemsPerPage: 50,
     searchType: 'all',
-    customPath: localStorage.getItem('customPath') || 'music_database_V4.8.json',
+    customPath: localStorage.getItem('customPath') || 'music_database_V4.8.7.json',
     selectedAlbums : [],
 
     init() {
@@ -13,8 +13,8 @@ const App = {
             ThemeModule.init();
         }
         this.addEventListenerSafely('fileInput', 'change', this.handleFileUpload.bind(this));
-        this.loadData();
-        // this.loadCustomFile();
+        // this.loadData();
+        this.loadCustomFile();
         this.loadSettings();
         this.initScrollToTop();
         this.initScrollToBottom();
@@ -83,9 +83,15 @@ const App = {
             return fetch(path)
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
+                        throw new Error('File not found');
                     }
                     return response.json();
+                })
+                .then(data => {
+                    this.albums = FileHandler.processData(data);
+                    this.setLoadMessage('test file loaded successfully');
+                    this.populateAlbumList();
+                    this.search();
                 })
                 .catch(error => {
                     console.error(`Error fetching ${path}:`, error);
@@ -119,7 +125,7 @@ const App = {
                 this.albums = [...genshinData, ...starRailData];
                 this.setLoadMessage('选中的文件加载成功');
                 this.populateAlbumList();
-                this.populateSpecialCollectionSelect();
+                // this.populateSpecialCollectionSelect();
                 this.search();
             })
             .catch(error => {
