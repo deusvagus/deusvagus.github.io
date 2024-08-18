@@ -1,45 +1,60 @@
 <!DOCTYPE html>
-<html lang="zh-tw">
+<html lang="zh-cn">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>曲目信息搜索 V4.8</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>原神曲目信息搜索 V4.8</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
+
 <body>
     <div id="app">
-        <div id="sidebar">
-            <input type="file" id="fileInput">
-            <div id="albumList" class="album-list">
-                <h3>专辑列表</h3>
-                <div class="album-controls">
-                    <button id="selectAllAlbums">全选</button>
-                    <button id="deselectAllAlbums">全不选</button>
+        <div id="mobileControls" class="mobile-only">
+            <button id="toggleSearch">搜索</button>
+            <button id="toggleAlbums">专辑</button>
+            <button id="toggleTools">工具</button>
+            <button id="closeAllSections">返回</button>
+        </div>
+        <div id="sidebar" class="collapsible">
+            <button class="close-btn mobile-only">&times;</button>
+            <div id="sidebar">
+                <input type="file" id="fileInput">
+                <div id="albumList" class="album-list">
+                    <h3>专辑列表</h3>
+                    <div class="album-controls">
+                        <button id="selectAllAlbums">全选</button>
+                        <button id="deselectAllAlbums">全不选</button>
+                    </div>
+                    <div id="albumCheckboxes"></div>
                 </div>
-                <div id="albumCheckboxes"></div>
             </div>
         </div>
         <div id="mainContent">
-            <div id="searchSection">
-                <div class="search-controls">
-                    <span class="settings-label">搜尋设置：</span>
-                    <button id="allSearch" class="toggle-button active">全部</button>
-                    <button id="titleSearch" class="toggle-button">标题</button>
-                    <button id="composerSearch" class="toggle-button">作曲</button>
-                    <button id="arrangerSearch" class="toggle-button">编曲</button>
-                    <button id="otherSearch" class="toggle-button">其他</button>
-                    <input type="text" id="keywordInput" placeholder="請輸入關鍵字">
-                    <button id="searchButton">搜索</button>
-                </div>
-                <div class="checkbox-group">
-                    <span class="settings-label">显示设置：</span>
-                    <label><input type="checkbox" id="composerCheckbox" checked> 作曲</label>
-                    <label><input type="checkbox" id="arrangerCheckbox" checked> 编曲</label>
-                    <label><input type="checkbox" id="otherCheckbox" checked> 其他</label>
-                    <select id="sortOrder">
-                        <option value="newest">新在前</option>
-                        <option value="oldest">旧在前</option>
-                    </select>
+            <div id="searchSection" class="collapsible">
+                <button class="close-btn mobile-only">&times;</button>
+                <div id="searchSection">
+                    <div class="search-controls">
+                        <span class="settings-label">搜尋设置：</span>
+                        <button id="allSearch" class="toggle-button active">全部</button>
+                        <button id="titleSearch" class="toggle-button">标题</button>
+                        <button id="composerSearch" class="toggle-button">作曲</button>
+                        <button id="arrangerSearch" class="toggle-button">编曲</button>
+                        <button id="otherSearch" class="toggle-button">其他</button>
+                        <input type="text" id="keywordInput" placeholder="請輸入關鍵字">
+                        <button id="searchButton">搜索</button>
+                    </div>
+                    <div class="checkbox-group">
+                        <span class="settings-label">显示设置：</span>
+                        <label><input type="checkbox" id="composerCheckbox" checked> 作曲</label>
+                        <label><input type="checkbox" id="arrangerCheckbox" checked> 编曲</label>
+                        <label><input type="checkbox" id="otherCheckbox" checked> 其他</label>
+                        <select id="sortOrder">
+                            <option value="newest">新在前</option>
+                            <option value="oldest">旧在前</option>
+                        </select>
+                    </div>
+
                 </div>
 
             </div>
@@ -47,21 +62,23 @@
             <div class="pagination" id="pagination"></div>
         </div>
     </div>
-
-    <div class="floating-controls">
-        <div class="control-group">
-            <span>全部曲目</span>
-            <button id="expandAllTracks">展开</button>
-            <button id="collapseAllTracks">折叠</button>
-        </div>
-        <div class="control-group">
-            <span>全部专辑</span>
-            <button id="expandAllAlbums">展开</button>
-            <button id="collapseAllAlbums">折叠</button>
-        </div>
-        <div class="control-group">
-            <button id="scrollToTopBtn" class="scroll-to-top">回到顶部</button>
-            <button id="scrollToBottomBtn" class="scroll-to-bottom">滾動到底部</button>
+    <div id="toolsPanel" class="collapsible">
+        <button class="close-btn mobile-only">&times;</button>
+        <div class="floating-controls">
+            <div class="control-group">
+                <span>全部曲目</span>
+                <button id="expandAllTracks">展开</button>
+                <button id="collapseAllTracks">折叠</button>
+            </div>
+            <div class="control-group">
+                <span>全部专辑</span>
+                <button id="expandAllAlbums">展开</button>
+                <button id="collapseAllAlbums">折叠</button>
+            </div>
+            <div class="control-group">
+                <button id="scrollToTopBtn" class="scroll-to-top">回到顶部</button>
+                <button id="scrollToBottomBtn" class="scroll-to-bottom">滾動到底部</button>
+            </div>
         </div>
     </div>
     <div id="settingsMenu">
@@ -88,7 +105,8 @@
             </label>
             <label>
                 侧边栏宽度：
-                <input type="range" id="sidebarWidthInput" min="150" max="500" value="250" oninput="this.nextElementSibling.value = this.value">
+                <input type="range" id="sidebarWidthInput" min="150" max="500" value="250"
+                    oninput="this.nextElementSibling.value = this.value">
                 <output>300</output> px
             </label>
         </div>
@@ -99,5 +117,7 @@
     <script src="js/file-handler.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/app.js"></script>
+    <script src="js/mobile.js"></script>
 </body>
+
 </html>

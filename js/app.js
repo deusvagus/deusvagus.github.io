@@ -16,6 +16,7 @@ const App = {
         this.loadSettings();
         this.initScrollToTop();
         this.initScrollToBottom();
+        MobileUI.init();
     },
 
     bindEvents() {
@@ -402,6 +403,12 @@ const App = {
         });
     }
 };
+
+
+
+
+
+
 
 // 初始化应用
 document.addEventListener('DOMContentLoaded', () => App.init());
