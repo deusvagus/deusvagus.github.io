@@ -26,7 +26,7 @@ const App = {
     
     bindEvents() {
         this.addEventListenerSafely('loadFileBtn', 'click', this.handleFileUpload.bind(this));
-        this.addEventListenerSafely('reloadDataBtn', 'click', this.loadData.bind(this));
+        this.addEventListenerSafely('reloadDataBtn', 'click', this.loadCustomFile.bind(this));
         this.addEventListenerSafely('genshinPath', 'change', this.updatePath.bind(this, 'genshinPath'));
         this.addEventListenerSafely('starRailPath', 'change', this.updatePath.bind(this, 'starRailPath'));
         this.addEventListenerSafely('specialCollectionPath', 'change', this.updatePath.bind(this, 'specialCollectionPath'));
@@ -73,9 +73,9 @@ const App = {
     },
     
     loadData() {
-        const genshinPath = 'genshin.json';
-        const starRailPath = 'starrail.json';
-        const specialCollectionPath = 'collections.json';
+        const genshinPath = '';
+        const starRailPath = '';
+        const specialCollectionPath = '';
     
         const loadPromises = [];
     
