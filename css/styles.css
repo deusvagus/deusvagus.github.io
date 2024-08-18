@@ -482,7 +482,7 @@ input[type="reset"] {
         padding: 5px;
         background-color: transparent;
         position: fixed;
-        bottom: 30%;
+        bottom: 20%;
         z-index: 1000;
     }
 
