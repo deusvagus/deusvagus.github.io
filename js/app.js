@@ -14,7 +14,7 @@ const App = {
         }
         this.addEventListenerSafely('fileInput', 'change', this.handleFileUpload.bind(this));
         this.loadData();
-        this.loadCustomFile();
+        // this.loadCustomFile();
         this.loadSettings();
         this.initScrollToTop();
         this.initScrollToBottom();
