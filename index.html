@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-tw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>曲名搜索</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div id="app">
+        <div id="sidebar">
+            <input type="file" id="fileInput">
+            <div id="albumList" class="album-list">
+                <h3>专辑列表</h3>
+                <div class="album-controls">
+                    <button id="selectAllAlbums">全选</button>
+                    <button id="deselectAllAlbums">全不选</button>
+                </div>
+                <div id="albumCheckboxes"></div>
+            </div>
+        </div>
+        <div id="mainContent">
+            <div id="searchSection">
+                <div class="search-controls">
+                    <span class="settings-label">搜尋设置：</span>
+                    <button id="allSearch" class="toggle-button active">全部</button>
+                    <button id="titleSearch" class="toggle-button">标题</button>
+                    <button id="composerSearch" class="toggle-button">作曲</button>
+                    <button id="arrangerSearch" class="toggle-button">编曲</button>
+                    <button id="otherSearch" class="toggle-button">其他</button>
+                    <input type="text" id="keywordInput" placeholder="請輸入關鍵字">
+                    <button id="searchButton">搜索</button>
+                </div>
+                <div class="checkbox-group">
+                    <span class="settings-label">显示设置：</span>
+                    <label><input type="checkbox" id="composerCheckbox" checked> 作曲</label>
+                    <label><input type="checkbox" id="arrangerCheckbox" checked> 编曲</label>
+                    <label><input type="checkbox" id="otherCheckbox" checked> 其他</label>
+                    <select id="sortOrder">
+                        <option value="newest">新在前</option>
+                        <option value="oldest">舊在前</option>
+                    </select>
+                </div>
+
+            </div>
+            <div id="results"></div>
+            <div class="pagination" id="pagination"></div>
+        </div>
+    </div>
+
+    <div class="floating-controls">
+        <div class="control-group">
+            <span>全部曲目</span>
+            <button id="expandAllTracks">展開</button>
+            <button id="collapseAllTracks">折疊</button>
+        </div>
+        <div class="control-group">
+            <span>全部专辑</span>
+            <button id="expandAllAlbums">展開</button>
+            <button id="collapseAllAlbums">折疊</button>
+        </div>
+        <div class="control-group">
+            <button id="scrollToTopBtn" class="scroll-to-top">回到顶部</button>
+            <button id="scrollToBottomBtn" class="scroll-to-bottom">滾動到底部</button>
+        </div>
+    </div>
+    <div id="settingsMenu">
+        <button id="settingsBtn">设置</button>
+        <div id="settingsPanel" style="display: none;">
+            <h3>UI 设置</h3>
+            <button id="customPathBtn">设置自定义路径</button>
+            <button id="loadCustomPathBtn">获取自定义路径文件</button>
+
+            <label>
+                字体大小：
+                <select id="fontSizeSelect">
+                    <option value="14px">小</option>
+                    <option value="16px" selected>中</option>
+                    <option value="18px">大</option>
+                </select>
+            </label>
+            <label>
+                主题：
+                <select id="themeSelect">
+                    <option value="light">浅色</option>
+                    <option value="dark" selected>深色</option>
+                </select>
+            </label>
+            <label>
+                侧边栏宽度：
+                <input type="range" id="sidebarWidthInput" min="150" max="500" value="250" oninput="this.nextElementSibling.value = this.value">
+                <output>300</output> px
+            </label>
+        </div>
+    </div>
+    <script src="js/theme.js"></script>
+    <script src="js/ui-renderer.js"></script>
+    <script src="js/search-module.js"></script>
+    <script src="js/file-handler.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
