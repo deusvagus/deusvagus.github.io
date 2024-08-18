@@ -563,7 +563,7 @@ const App = {
     },
     
     selectStarRailAlbums() {
-        this.selectAlbumsByKeyword('崩坏星穹铁道');
+        this.selectAlbumsByKeyword('星穹');
     },
     selectAlbumsByKeyword(keyword) {
         const checkboxes = document.querySelectorAll('#albumCheckboxes input[type="checkbox"]');
