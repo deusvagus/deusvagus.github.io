@@ -129,6 +129,7 @@ const App = {
     
         this.saveSettings();
     },
+    
     loadCustomFile() {
         fetch(this.customPath)
             .then(response => {

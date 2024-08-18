@@ -27,6 +27,7 @@ const SearchModule = {
                 // 只有在"全部"搜索或特定类型搜索时才搜索其他字段
                 if (type !== 'title') {
                     const searchInRole = (roleArray, roleType) => {
+                        if (!roleArray || !Array.isArray(roleArray)) return;
                         roleArray.forEach(item => {
                             if (item.name.toLowerCase().includes(lowerKeyword)) {
                                 matchFound = true;
