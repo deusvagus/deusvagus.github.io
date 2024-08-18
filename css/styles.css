@@ -480,7 +480,7 @@ input[type="reset"] {
         right:0px;
         flex-direction: column; /* 改成垂直排列 */
         padding: 5px;
-        background-color: var(--surface-color);
+        background-color: transparent;
         position: fixed;
         bottom: 30%;
         z-index: 1000;
