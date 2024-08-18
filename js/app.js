@@ -17,19 +17,8 @@ const App = {
         this.initScrollToTop();
         this.initScrollToBottom();
         MobileUI.init();
-        if (isMobileDevice()) {
-            MobileUI.init();
-        }
     },
     
-    isMobileDevice() {
-        const isMobile = window.innerWidth <= 768; // 假設寬度小於等於 768px 為手機裝置
-        if (isMobile) {
-            console.log('Mobile device detected based on screen width');
-        }
-        return isMobile;
-    },
-
     bindEvents() {
         this.addEventListenerSafely('fileInput', 'change', this.handleFileUpload.bind(this));
         this.addEventListenerSafely('keywordInput', 'input', Utils.debounce(this.search.bind(this), 300));
