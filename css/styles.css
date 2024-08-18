@@ -490,7 +490,7 @@ input[type="reset"] {
         bottom: 10%;
         margin: 3px 0; /* 修改按鈕間距 */
         padding: 8px 12px; /* 修改按鈕高度 */
-        z-index: 2000;
+        z-index: 1050;
         cursor: pointer;
     }
 
@@ -510,8 +510,13 @@ input[type="reset"] {
         display: block;
     }
 
-
-     #searchSection, #toolsPanel {
+    #searchSection {
+        /* width: 100%; */
+        /* max-width: 100%; */
+        border: none;
+        z-index: 900;
+    }
+    #toolsPanel {
         width: 100%;
         max-width: 100%;
         height: 50%;
@@ -537,6 +542,7 @@ input[type="reset"] {
     }
     
     .floating-controls {
+        z-index: 1000;
         position: fixed;
         top: 20px;
         right: 20px;
