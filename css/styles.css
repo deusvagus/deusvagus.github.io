@@ -131,6 +131,16 @@ input[type="reset"] {
     letter-spacing: 0.5px;
 }
 
+
+#specialCollectionSelect {
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background-color: var(--surface-color);
+    color: var(--text-color);
+    font-size: 18px;
+}
+
 #loadMessage {
     margin-bottom: 20px;
     font-weight: bold;

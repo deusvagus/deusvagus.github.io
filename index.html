@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>原神曲目信息搜索 V4.8.4</title>
+    <title>原神曲目信息搜索 V4.8.5</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 
@@ -55,15 +55,13 @@
                             <option value="newest">新在前</option>
                             <option value="oldest">旧在前</option>
                         </select>
-                        <label for="specialCollectionSelect">包含(test)：</label>
+                        <label for="specialCollectionSelect">包含(test)</label>
                         <select id="specialCollectionSelect">
                             <option value="">无</option>
                             <!-- 其他选项将通过 JavaScript 动态添加 -->
                         </select>
                     </div>
                 </div>
-                <div id="loadMessage"></div>
-
             </div>
             <div id="results"></div>
             <div class="pagination" id="pagination"></div>
@@ -92,6 +90,7 @@
     <button id="settingsBtn">设置</button>
         <div id="settingsPanel" style="display: none;">
             <h3>数据文件加载</h3>
+            <div id="loadMessage"></div>
             <div>
                 <input type="file" id="fileInput" accept=".json">
                 <button id="loadFileBtn">加载文件</button>
@@ -105,7 +104,7 @@
                     <input type="checkbox" id="loadStarRail" checked> 星穹铁道
                 </label>
                 <label style="white-space: nowrap;">
-                    <input type="checkbox" id="loadSpecialCollection" checked> 特别收录
+                    <input type="checkbox" id="loadSpecialCollection" checked> 收集
                 </label>
             </div>
             <button id="reloadDataBtn">重新加载预设数据</button>            <h3>UI 设置</h3>

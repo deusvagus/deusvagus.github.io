@@ -77,7 +77,6 @@ const App = {
         const specialCollectionPath = 'collections.json';
     
         const loadPromises = [];
-    
         if (document.getElementById('loadGenshin').checked) {
             loadPromises.push(this.loadJSON(genshinPath));
         } else {
@@ -270,6 +269,10 @@ const App = {
         this.search();
     },
     search() {
+        if (!this.albums || this.albums.length === 0) {
+            console.log('No albums loaded yet');
+            return;
+        }
         const keyword = document.getElementById('keywordInput').value.trim();
         const filters = {
             composerChecked: document.getElementById('composerCheckbox').checked,
