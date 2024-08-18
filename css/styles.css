@@ -513,6 +513,7 @@ input[type="reset"] {
     #searchSection {
         /* width: 100%; */
         /* max-width: 100%; */
+        height: auto;
         border: none;
         z-index: 900;
     }
