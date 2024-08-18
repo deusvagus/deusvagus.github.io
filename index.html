@@ -19,12 +19,14 @@
         <div id="sidebar" class="collapsible">
             <button class="close-btn mobile-only">&times;</button>
             <div id="sidebar">
-                <input type="file" id="fileInput">
+                <!-- <input type="file" id="fileInput"> -->
                 <div id="albumList" class="album-list">
                     <h3>专辑列表</h3>
                     <div class="album-controls">
                         <button id="selectAllAlbums">全选</button>
                         <button id="deselectAllAlbums">全不选</button>
+                        <button id="selectGenshinAlbums">原神全选</button>
+                        <button id="selectStarRailAlbums">星铁全选</button>
                     </div>
                     <div id="albumCheckboxes"></div>
                 </div>
@@ -53,9 +55,14 @@
                             <option value="newest">新在前</option>
                             <option value="oldest">旧在前</option>
                         </select>
+                        <label for="specialCollectionSelect">包含(test)：</label>
+                        <select id="specialCollectionSelect">
+                            <option value="">无</option>
+                            <!-- 其他选项将通过 JavaScript 动态添加 -->
+                        </select>
                     </div>
-
                 </div>
+                <div id="loadMessage"></div>
 
             </div>
             <div id="results"></div>
@@ -82,12 +89,26 @@
         </div>
     </div>
     <div id="settingsMenu">
-        <button id="settingsBtn">设置</button>
+    <button id="settingsBtn">设置</button>
         <div id="settingsPanel" style="display: none;">
-            <h3>UI 设置</h3>
-            <button id="customPathBtn">设置自定义路径</button>
-            <button id="loadCustomPathBtn">获取自定义路径文件</button>
-
+            <h3>数据文件加载</h3>
+            <div>
+                <input type="file" id="fileInput" accept=".json">
+                <button id="loadFileBtn">加载文件</button>
+            </div>
+            <h3>预设数据文件选项</h3>
+            <div class="preset-options">
+                <label style="white-space: nowrap;">
+                    <input type="checkbox" id="loadGenshin" checked> 原神
+                </label>
+                <label style="white-space: nowrap;">
+                    <input type="checkbox" id="loadStarRail" checked> 星穹铁道
+                </label>
+                <label style="white-space: nowrap;">
+                    <input type="checkbox" id="loadSpecialCollection" checked> 特别收录
+                </label>
+            </div>
+            <button id="reloadDataBtn">重新加载预设数据</button>            <h3>UI 设置</h3>
             <label>
                 字体大小：
                 <select id="fontSizeSelect">
@@ -111,6 +132,7 @@
             </label>
         </div>
     </div>
+    <script src="js/SpecialCollection.js"></script>
     <script src="js/theme.js"></script>
     <script src="js/ui-renderer.js"></script>
     <script src="js/search-module.js"></script>

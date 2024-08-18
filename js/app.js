@@ -12,14 +12,26 @@ const App = {
         if (typeof ThemeModule !== 'undefined' && ThemeModule.init) {
             ThemeModule.init();
         }
-        this.loadCustomFile();
+        this.addEventListenerSafely('fileInput', 'change', this.handleFileUpload.bind(this));
+        this.loadData();
         this.loadSettings();
         this.initScrollToTop();
         this.initScrollToBottom();
         MobileUI.init();
+        SpecialCollectionHandler.loadCollections('path/to/special_collections.json');
+        this.addEventListenerSafely('specialCollectionSelect', 'change', this.handleSpecialCollectionChange.bind(this));
+        this.addEventListenerSafely('loadCustomPathsBtn', 'click', this.loadCustomPaths.bind(this));
     },
     
     bindEvents() {
+        this.addEventListenerSafely('loadFileBtn', 'click', this.handleFileUpload.bind(this));
+        this.addEventListenerSafely('reloadDataBtn', 'click', this.loadData.bind(this));
+        this.addEventListenerSafely('genshinPath', 'change', this.updatePath.bind(this, 'genshinPath'));
+        this.addEventListenerSafely('starRailPath', 'change', this.updatePath.bind(this, 'starRailPath'));
+        this.addEventListenerSafely('specialCollectionPath', 'change', this.updatePath.bind(this, 'specialCollectionPath'));
+        
+        this.addEventListenerSafely('selectGenshinAlbums', 'click', this.selectGenshinAlbums.bind(this));
+        this.addEventListenerSafely('selectStarRailAlbums', 'click', this.selectStarRailAlbums.bind(this));
         this.addEventListenerSafely('fileInput', 'change', this.handleFileUpload.bind(this));
         this.addEventListenerSafely('keywordInput', 'input', Utils.debounce(this.search.bind(this), 300));
         this.addEventListenerSafely('searchButton', 'click', this.search.bind(this));
@@ -33,8 +45,6 @@ const App = {
             this.addEventListenerSafely(`${type}Checkbox`, 'change', this.search.bind(this));
         });
 
-        this.addEventListenerSafely('customPathBtn', 'click', this.setCustomPath.bind(this));
-        this.addEventListenerSafely('loadCustomPathBtn', 'click', this.loadCustomFile.bind(this));
         this.addEventListenerSafely('selectAllAlbums', 'click', this.selectAllAlbums.bind(this));
         this.addEventListenerSafely('deselectAllAlbums', 'click', this.deselectAllAlbums.bind(this));
 
@@ -60,32 +70,99 @@ const App = {
             console.warn(`Element with id '${id}' not found`);
         }
     },
-
-    async handleFileUpload(event) {
-        const file = event.target.files[0];
-        if (file) {
-            try {
-                const data = await FileHandler.loadFile(file);
-                this.albums = FileHandler.processData(data);
-                this.setLoadMessage('文件載入成功');
-                this.populateAlbumList();
-                this.search();
-            } catch (error) {
-                console.error('File loading error:', error);
-                this.setLoadMessage('文件載入失敗：' + error.message);
-            }
+    
+    loadData() {
+        const genshinPath = 'genshin.json';
+        const starRailPath = 'starrail.json';
+        const specialCollectionPath = 'collections.json';
+    
+        const loadPromises = [];
+    
+        if (document.getElementById('loadGenshin').checked) {
+            loadPromises.push(this.loadJSON(genshinPath));
+        } else {
+            loadPromises.push(Promise.resolve([]));
         }
+    
+        if (document.getElementById('loadStarRail').checked) {
+            loadPromises.push(this.loadJSON(starRailPath));
+        } else {
+            loadPromises.push(Promise.resolve([]));
+        }
+    
+        if (document.getElementById('loadSpecialCollection').checked) {
+            loadPromises.push(SpecialCollectionHandler.loadCollections(specialCollectionPath));
+        } else {
+            loadPromises.push(Promise.resolve({}));
+        }
+    
+        Promise.all(loadPromises)
+            .then(([genshinData, starRailData, specialCollections]) => {
+                this.albums = [...genshinData, ...starRailData];
+                SpecialCollectionHandler.collections = specialCollections;
+                this.setLoadMessage('选中的文件加载成功');
+                this.populateAlbumList();
+                this.populateSpecialCollectionSelect();
+                this.search();
+            })
+            .catch(error => {
+                console.error('Error loading files:', error);
+                this.setLoadMessage('文件加载失败：' + error.message);
+            });
+    
+        this.saveSettings();
+    },    
+    populateSpecialCollectionSelect() {
+        const select = document.getElementById('specialCollectionSelect');
+        select.innerHTML = '<option value="">无</option>';
+        Object.keys(SpecialCollectionHandler.collections).forEach(key => {
+            const option = document.createElement('option');
+            option.value = key;
+            option.textContent = key;
+            select.appendChild(option);
+        });
+    },
+    
+    
+    loadJSON(path) {
+        return fetch(path).then(response => response.json());
     },
 
+    async handleFileUpload(event) {
+        const fileInput = document.getElementById('fileInput');
+        const file = fileInput.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    this.albums = FileHandler.processData(data);
+                    this.setLoadMessage('文件加载成功');
+                    this.populateAlbumList();
+                    this.search();
+                } catch (error) {
+                    console.error('File parsing error:', error);
+                    this.setLoadMessage('文件加载失败：' + error.message);
+                }
+            };
+            reader.onerror = (error) => {
+                console.error('File reading error:', error);
+                this.setLoadMessage('文件读取失败');
+            };
+            reader.readAsText(file);
+        } else {
+            this.setLoadMessage('请选择一个文件');
+        }
+    },
+    
     setLoadMessage(message) {
-        const loadMessage = document.getElementById('loadMessage');
-        if (loadMessage) {
-            loadMessage.textContent = message;
+        const loadMessageElement = document.getElementById('loadMessage');
+        if (loadMessageElement) {
+            loadMessageElement.textContent = message;
         } else {
             console.warn('Load message element not found');
         }
     },
-
     setCustomPath() {
         const newPath = prompt("请输入自定义文件路径:", this.customPath);
         if (newPath) {
@@ -95,26 +172,25 @@ const App = {
         }
     },
 
-    loadCustomFile() {
-        fetch(this.customPath)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('File not found');
-                }
-                return response.json();
-            })
-            .then(data => {
-                this.albums = FileHandler.processData(data);
-                this.setLoadMessage('文件自动載入成功');
-                this.populateAlbumList();
-                this.search();
-            })
-            .catch(error => {
-                console.error('Auto-load file error:', error);
-                this.setLoadMessage('未找到自动加载文件，请检查路径是否正确。');
-            });
+    loadCustomPaths() {
+        const genshinPath = document.getElementById('genshinPath').value;
+        const starRailPath = document.getElementById('starRailPath').value;
+        const specialCollectionPath = document.getElementById('specialCollectionPath').value;
+    
+        Promise.all([
+            this.loadJSON(genshinPath),
+            this.loadJSON(starRailPath),
+            SpecialCollectionHandler.loadCollections(specialCollectionPath)
+        ]).then(([genshinData, starRailData]) => {
+            this.albums = [...genshinData, ...starRailData];
+            this.setLoadMessage('所有文件加载成功');
+            this.populateAlbumList();
+            this.search();
+        }).catch(error => {
+            console.error('Error loading files:', error);
+            this.setLoadMessage('文件加载失败：' + error.message);
+        });
     },
-
     populateAlbumList() {
         const albumCheckboxes = document.getElementById('albumCheckboxes');
         if (!albumCheckboxes) return;
@@ -205,11 +281,18 @@ const App = {
         const selectedAlbums = Array.from(document.querySelectorAll('#albumCheckboxes input:checked'))
             .map(checkbox => checkbox.value);
     
+        // 执行基本搜索
         this.searchResults = SearchModule.search(this.albums, keyword, this.searchType, filters, selectedAlbums);
+    
+        // 应用特别收录过滤
+        const specialCollection = document.getElementById('specialCollectionSelect').value;
+        if (specialCollection) {
+            this.searchResults = SpecialCollectionHandler.filterResults(this.searchResults, specialCollection);
+        }
+    
         this.currentPage = 1;
         this.displayResults();
     },
-
     displayResults() {
         const sortOrder = document.getElementById('sortOrder').value;
         this.searchResults.sort((a, b) => {
@@ -268,15 +351,22 @@ const App = {
     },
 
     toggleSettings() {
+        console.log('Toggle settings called');
         const settingsPanel = document.getElementById('settingsPanel');
         if (settingsPanel) {
-            settingsPanel.style.display = settingsPanel.style.display === 'none' ? 'block' : 'none';
+            console.log('Settings panel found');
+            const newDisplay = settingsPanel.style.display === 'none' ? 'block' : 'none';
+            console.log(`Changing display to: ${newDisplay}`);
+            settingsPanel.style.display = newDisplay;
+        } else {
+            console.error('Settings panel not found');
         }
     },
-
     changeFontSize(event) {
-        document.body.style.fontSize = event.target.value;
-        localStorage.setItem('fontSize', event.target.value);
+        const size = event.target.value;
+        document.body.classList.remove('font-small', 'font-medium', 'font-large');
+        document.body.classList.add(`font-${size}`);
+        localStorage.setItem('fontSize', size);
     },
 
     changeTheme(event) {
@@ -313,8 +403,26 @@ const App = {
                 document.getElementById('sidebarWidthInput').value = sidebarWidth;
             }
         }
+        ['Genshin', 'StarRail', 'SpecialCollection'].forEach(fileType => {
+            const checkbox = document.getElementById(`load${fileType}`);
+            if (checkbox) {
+                const savedState = localStorage.getItem(`load${fileType}`);
+                checkbox.checked = savedState === null ? true : (savedState === 'true');
+            }
+        });
     },
-
+    saveSettings() {
+        // ... 其他设置保存代码 ...
+        
+        // 保存文件选择状态
+        ['Genshin', 'StarRail', 'SpecialCollection'].forEach(fileType => {
+            const checkbox = document.getElementById(`load${fileType}`);
+            if (checkbox) {
+                localStorage.setItem(`load${fileType}`, checkbox.checked);
+            }
+        });
+    },
+    
     toggleAllTracks(action) {
         const roleCcntainers = document.querySelectorAll('.role-container');
         roleCcntainers.forEach(container => {
@@ -401,6 +509,26 @@ const App = {
                 behavior: "smooth"
             });
         });
+    },
+    selectGenshinAlbums() {
+        this.selectAlbumsByKeyword('原神');
+    },
+    
+    selectStarRailAlbums() {
+        this.selectAlbumsByKeyword('崩坏星穹铁道');
+    },
+    selectAlbumsByKeyword(keyword) {
+        const checkboxes = document.querySelectorAll('#albumCheckboxes input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = checkbox.value.includes(keyword);
+        });
+        this.search();
+    },
+    handleSpecialCollectionChange() {
+        this.search();
+    },
+    updatePath(pathType, event) {
+        localStorage.setItem(pathType, event.target.value);
     }
 };
 
