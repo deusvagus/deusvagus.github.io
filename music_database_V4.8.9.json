@@ -3,12 +3,14 @@
     "album": "NATLAN (unknown)",
     "date": "2024-08-16",
     "tracks":[
-        "track": "纳塔 Natlan",
-        "作曲": "苑迪萌 dimeng yuan (HOYO-MiX)"
-    ],
-    [
+      {
+        "track":"纳塔 Natlan",
+        "作曲":"苑迪萌 dimeng yuan (HOYO-MiX)"
+      },
+      {
         "track":"苍原的颂灵歌 Anthem of the Savannah",
         "作曲":"王予曦 Yuxi Wang (HOYO-MiX)"
+      }
     ]
   },
   {
