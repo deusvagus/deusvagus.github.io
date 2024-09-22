@@ -37,8 +37,8 @@ const FileHandler = {
                 const lowerRole = role.toLowerCase();
                 if (lowerRole.includes('作曲') || lowerRole.includes('composer')) {
                     processedTrack.composers.push({ role, name });
-                } else if (lowerRole.includes('编曲') || lowerRole.includes('arranger') ||
-                    lowerRole.includes('orchestrator') || lowerRole.includes('配器') ||
+                } else if (lowerRole.includes('编曲') || lowerRole.includes('arranger') || lowerRole.includes('Adoption') ||
+                    lowerRole.includes('orchestrator') || lowerRole.includes('配器') || lowerRole.includes('改编') ||
                     lowerRole.includes('编配')) {
                     processedTrack.arrangers.push({ role, name });
                 } else {
