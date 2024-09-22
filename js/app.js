@@ -4,7 +4,7 @@ const App = {
     currentPage: 1,
     itemsPerPage: 500,
     searchType: 'all',
-    customPath: localStorage.getItem('customPath') || 'music_database_V4.8.9.json',
+    customPath: localStorage.getItem('customPath') || 'music_database_V5.0.2.json',
     selectedAlbums : [],
 
     init() {
