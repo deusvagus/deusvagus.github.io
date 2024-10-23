@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GI HSR Music Database V5.1.2.1</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <title>GI HSR Music Database V5.1.2.2</title>
+    <link rel="stylesheet" href="styles/main.css">
 </head>
 
 <body>
@@ -55,6 +55,11 @@
                             <option value="newest">新在前</option>
                             <option value="oldest">旧在前</option>
                         </select>
+                        <label for="specialCollectionSelect">包含(test)</label>
+                        <select id="specialCollectionSelect">
+                            <option value="">无</option>
+                            <!-- 其他选项将通过 JavaScript 动态添加 -->
+                        </select>
                     </div>
                 </div>
             </div>
@@ -102,8 +107,159 @@
                     <input type="checkbox" id="loadSpecialCollection" checked> 收集
                 </label>
             </div>
-            <button id="reloadDataBtn">重新加载预设数据</button>          
-        <h3>UI 设置</h3>
+            <button id="reloadDataBtn">重新加载预设数据</button>            <h3>UI 设置</h3>
+            <label>
+                字体大小：
+                <select id="fontSizeSelect">
+                    <option value="14px">小</option>
+                    <option value="16px" selected>中</option>
+                    <option value="18px">大</option>
+                </select>
+            </label>
+            <label>
+                主题：
+                <select id="themeSelect">
+                    <option value="light">浅色</option>
+                    <option value="dark" selected>深色</option>
+                </select>
+            </label>
+            <label>
+                侧边栏宽度：
+                <input type="range" id="sidebarWidthInput" min="150" max="500" value="250"
+                    oninput="this.nextElementSibling.value = this.value">
+                <output>300</output> px
+            </label>
+        </div>
+    </div>
+    <script src="js/SpecialCollection.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/ui-renderer.js"></script>
+    <script src="js/search-module.js"></script>
+    <script src="js/file-handler.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/mobile.js"></script>
+</body>
+
+</html>
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GI HSR Music Database V5.0.2</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+
+<body>
+    <div id="app">
+        <div id="mobileControls" class="mobile-only">
+            <button id="toggleSearch">搜索</button>
+            <button id="toggleAlbums">专辑</button>
+            <button id="toggleTools">工具</button>
+            <button id="closeAllSections">关闭</button>
+        </div>
+        <div id="sidebar" class="collapsible">
+            <button class="close-btn mobile-only">&times;</button>
+            <div id="sidebar">
+                <!-- <input type="file" id="fileInput"> -->
+                <div id="albumList" class="album-list">
+                    <h3>专辑列表</h3>
+                    <div class="album-controls">
+                        <button id="selectAllAlbums">全选</button>
+                        <button id="deselectAllAlbums">全不选</button>
+                        <button id="selectGenshinAlbums">原神全选</button>
+                        <button id="selectStarRailAlbums">星铁全选</button>
+                    </div>
+                    <div id="albumCheckboxes"></div>
+                </div>
+            </div>
+        </div>
+        <div id="mainContent">
+            <div id="searchSection" class="collapsible">
+                <button class="close-btn mobile-only">&times;</button>
+                <div id="searchSection">
+                    <div class="search-controls">
+                        <span class="settings-label">搜尋设置：</span>
+                        <button id="allSearch" class="toggle-button active">全部</button>
+                        <button id="titleSearch" class="toggle-button">标题</button>
+                        <button id="composerSearch" class="toggle-button">作曲</button>
+                        <button id="arrangerSearch" class="toggle-button">编曲</button>
+                        <button id="otherSearch" class="toggle-button">其他</button>
+                        <input type="text" id="keywordInput" placeholder="請輸入關鍵字">
+                        <button id="searchButton">搜索</button>
+                    </div>
+                    <div class="checkbox-group">
+                        <span class="settings-label">显示设置：</span>
+                        <label><input type="checkbox" id="composerCheckbox" checked> 作曲</label>
+                        <label><input type="checkbox" id="arrangerCheckbox" checked> 编曲</label>
+                        <label><input type="checkbox" id="otherCheckbox" checked> 其他</label>
+                        <select id="sortOrder">
+                            <option value="newest">新在前</option>
+                            <option value="oldest">旧在前</option>
+                        </select>
+                        <label for="specialCollectionSelect">包含(test)</label>
+                        <select id="specialCollectionSelect">
+                            <option value="">无</option>
+                            <!-- 其他选项将通过 JavaScript 动态添加 -->
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div id="results"></div>
+            <div class="pagination" id="pagination"></div>
+        </div>
+    </div>
+    <div id="toolsPanel" class="collapsible">
+        <button class="close-btn mobile-only">&times;</button>
+        <div class="floating-controls">
+            <div class="control-group">
+                <span>全部曲目</span>
+                <button id="expandAllTracks">展开</button>
+                <button id="collapseAllTracks">折叠</button>
+            </div>
+            <div class="control-group">
+                <span>全部专辑</span>
+                <button id="expandAllAlbums">展开</button>
+                <button id="collapseAllAlbums">折叠</button>
+            </div>
+            <div class="control-group">
+                <button id="scrollToTopBtn" class="scroll-to-top">回到顶部</button>
+                <button id="scrollToBottomBtn" class="scroll-to-bottom">滾動到底部</button>
+            </div>
+        </div>
+    </div>
+    <div id="settingsMenu">
+    <button id="settingsBtn">设置</button>
+        <div id="settingsPanel" style="display: none;">
+            <h3>数据文件加载</h3>
+            <div id="loadMessage"></div>
+            <div>
+                <input type="file" id="fileInput" accept=".json">
+                <button id="loadFileBtn">加载文件</button>
+            </div>
+            <h3>预设数据文件选项</h3>
+            <div class="preset-options">
+                <label style="white-space: nowrap;">
+                    <input type="checkbox" id="loadGenshin" checked> 原神
+                </label>
+                <label style="white-space: nowrap;">
+                    <input type="checkbox" id="loadStarRail" checked> 星穹铁道
+                </label>
+                <label style="white-space: nowrap;">
+                    <input type="checkbox" id="loadSpecialCollection" checked> 收集
+                </label>
+            </div>
+            <button id="reloadDataBtn">重新加载预设数据</button>            <h3>UI 设置</h3>
+            <label>
+                字体大小：
+                <select id="fontSizeSelect">
+                    <option value="14px">小</option>
+                    <option value="16px" selected>中</option>
+                    <option value="18px">大</option>
+                </select>
+            </label>
             <label>
                 主题：
                 <select id="themeSelect">
