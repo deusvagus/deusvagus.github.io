@@ -6,6 +6,7 @@ const App = {
     searchType: 'all',
     customPath: localStorage.getItem('customPath') || 'music_database_V5.3.0.json',
     selectedAlbums : [],
+    DEFAULT_SIDEBAR_WIDTH: 400,
 
     init() {
         this.bindEvents();
@@ -345,8 +346,11 @@ const App = {
     },
     changeFontSize(event) {
         const size = event.target.value;
+        // 移除所有字体大小类
         document.body.classList.remove('font-small', 'font-medium', 'font-large');
+        // 添加新的字体大小类
         document.body.classList.add(`font-${size}`);
+        // 保存设置
         localStorage.setItem('fontSize', size);
     },
 
@@ -357,17 +361,28 @@ const App = {
 
     changeSidebarWidth(event) {
         const sidebar = document.getElementById('sidebar');
+        const sidebarWidthInput = document.getElementById('sidebarWidthInput');
+        const widthOutput = sidebarWidthInput.nextElementSibling;
+        
         if (sidebar) {
-            sidebar.style.width = `${event.target.value}px`;
-            localStorage.setItem('sidebarWidth', event.target.value);
+            const newWidth = Math.min(Math.max(parseInt(event.target.value), 250), 600);
+            sidebar.style.width = `${newWidth}px`;
+            // 更新输出显示
+            if (widthOutput) {
+                widthOutput.value = newWidth;
+            }
+            localStorage.setItem('sidebarWidth', newWidth);
         }
     },
 
     loadSettings() {
-        const fontSize = localStorage.getItem('fontSize');
-        if (fontSize) {
-            document.body.style.fontSize = fontSize;
-            document.getElementById('fontSizeSelect').value = fontSize;
+        // 加载字体大小设置
+        const fontSize = localStorage.getItem('fontSize') || 'medium';
+        document.body.classList.remove('font-small', 'font-medium', 'font-large');
+        document.body.classList.add(`font-${fontSize}`);
+        const fontSizeSelect = document.getElementById('fontSizeSelect');
+        if (fontSizeSelect) {
+            fontSizeSelect.value = fontSize;
         }
 
         const theme = localStorage.getItem('theme');
@@ -376,13 +391,22 @@ const App = {
             document.getElementById('themeSelect').value = theme;
         }
 
-        const sidebarWidth = localStorage.getItem('sidebarWidth');
-        if (sidebarWidth) {
-            const sidebar = document.getElementById('sidebar');
-            if (sidebar) {
-                sidebar.style.width = `${sidebarWidth}px`;
-                document.getElementById('sidebarWidthInput').value = sidebarWidth;
-            }
+        const sidebarWidth = localStorage.getItem('sidebarWidth') || String(this.DEFAULT_SIDEBAR_WIDTH);
+        const sidebar = document.getElementById('sidebar');
+        const sidebarWidthInput = document.getElementById('sidebarWidthInput');
+        const widthOutput = sidebarWidthInput ? sidebarWidthInput.nextElementSibling : null;
+        
+        if (sidebar) {
+            const validWidth = Math.min(Math.max(parseInt(sidebarWidth), 250), 600);
+            sidebar.style.width = `${validWidth}px`;
+        }
+        if (sidebarWidthInput) {
+            sidebarWidthInput.value = sidebarWidth;
+            sidebarWidthInput.min = '250';
+            sidebarWidthInput.max = '600';
+        }
+        if (widthOutput) {
+            widthOutput.value = sidebarWidth;
         }
     },
     saveSettings() {
@@ -500,6 +524,23 @@ const App = {
     },
     updatePath(pathType, event) {
         localStorage.setItem(pathType, event.target.value);
+    },
+
+    resetSidebarWidth() {
+        const sidebar = document.getElementById('sidebar');
+        const sidebarWidthInput = document.getElementById('sidebarWidthInput');
+        const widthOutput = sidebarWidthInput ? sidebarWidthInput.nextElementSibling : null;
+        
+        if (sidebar && sidebarWidthInput) {
+            // 重置为默认值
+            sidebar.style.width = `${this.DEFAULT_SIDEBAR_WIDTH}px`;
+            sidebarWidthInput.value = this.DEFAULT_SIDEBAR_WIDTH;
+            if (widthOutput) {
+                widthOutput.value = this.DEFAULT_SIDEBAR_WIDTH;
+            }
+            // 保存到 localStorage
+            localStorage.setItem('sidebarWidth', this.DEFAULT_SIDEBAR_WIDTH);
+        }
     }
 };
 

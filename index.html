@@ -6,6 +6,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>GI HSR Music Database V5.3.0</title>
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* 字体大小类 */
+        body.font-small {
+            font-size: 14px !important;
+        }
+        body.font-medium {
+            font-size: 16px !important;
+        }
+        body.font-large {
+            font-size: 18px !important;
+        }
+
+        /* 确保搜索结果继承字体大小 */
+        #results {
+            font-size: inherit;
+        }
+        #results * {
+            font-size: inherit;
+        }
+
+        /* 防止某些元素继承字体大小（如果需要） */
+        .pagination,
+        .control-group button {
+            font-size: 14px;  /* 或其他固定大小 */
+        }
+
+        /* 防止设置面板文字被选中 */
+        #settingsPanel {
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+        
+        /* 允许输入框和选择框中的文字可以被选中 */
+        #settingsPanel input,
+        #settingsPanel select,
+        #settingsPanel option {
+            user-select: text;
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+        }
+    </style>
 </head>
 
 <body>
@@ -94,9 +138,9 @@
             <label>
                 字体大小：
                 <select id="fontSizeSelect">
-                    <option value="14px">小</option>
-                    <option value="16px" selected>中</option>
-                    <option value="18px">大</option>
+                    <option value="small">小</option>
+                    <option value="medium" selected>中</option>
+                    <option value="large">大</option>
                 </select>
             </label>
             <label>
@@ -107,10 +151,13 @@
                 </select>
             </label>
             <label>
-                侧边栏宽度：
-                <input type="range" id="sidebarWidthInput" min="150" max="500" value="250"
+                <span ondblclick="App.resetSidebarWidth()">侧边栏宽度：</span>
+                <input type="range" id="sidebarWidthInput" 
+                    min="250" 
+                    max="600" 
+                    value="400"
                     oninput="this.nextElementSibling.value = this.value">
-                <output>300</output> px
+                <output>400</output> px
             </label>
         </div>
     </div>
