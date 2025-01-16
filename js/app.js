@@ -4,7 +4,7 @@ const App = {
     currentPage: 1,
     itemsPerPage: 1000,
     searchType: 'all',
-    customPath: localStorage.getItem('customPath') || 'music_database_V5.3.0.json',
+    customPath: localStorage.getItem('customPath') || 'music_database_V5.3.1.json',
     selectedAlbums : [],
     DEFAULT_SIDEBAR_WIDTH: 400,
 
@@ -58,6 +58,24 @@ const App = {
         ['composer', 'arranger', 'other'].forEach(type => {
             this.addEventListenerSafely(`${type}Checkbox`, 'change', this.search.bind(this));
         });
+
+        // 添加专辑搜索功能
+        const albumSearchInput = document.getElementById('albumSearchInput');
+        this.addEventListenerSafely('albumSearchInput', 'input', () => {
+            Utils.debounce(this.filterAlbumList.bind(this), 300)();
+            this.toggleClearButton();
+        });
+        
+        // 添加清空按钮事件
+        this.addEventListenerSafely('clearAlbumSearch', 'click', this.clearAlbumSearch.bind(this));
+
+        // 添加主搜索框清空功能
+        this.addEventListenerSafely('keywordInput', 'input', () => {
+            Utils.debounce(this.search.bind(this), 300)();
+            this.toggleKeywordClearButton();
+        });
+        
+        this.addEventListenerSafely('clearKeywordSearch', 'click', this.clearKeywordSearch.bind(this));
     },
 
     addEventListenerSafely(id, event, handler) {
@@ -86,6 +104,7 @@ const App = {
                 setTimeout(() => {
                     this.populateAlbumList();
                     this.search(); // 初始化搜索显示所有结果
+                    this.toggleKeywordClearButton(); // 添加这行
                 }, 0);
             })
             .catch(error => {
@@ -183,6 +202,13 @@ const App = {
             albumCheckboxes.appendChild(label);
             albumCheckboxes.appendChild(document.createElement('br'));
         });
+        
+        // 初始化时清空搜索框并隐藏清空按钮
+        const searchInput = document.getElementById('albumSearchInput');
+        if (searchInput) {
+            searchInput.value = '';
+            this.toggleClearButton();
+        }
     },
 
     sortAlbums() {
@@ -540,6 +566,66 @@ const App = {
             }
             // 保存到 localStorage
             localStorage.setItem('sidebarWidth', this.DEFAULT_SIDEBAR_WIDTH);
+        }
+    },
+
+    filterAlbumList() {
+        const searchInput = document.getElementById('albumSearchInput');
+        if (!searchInput) return;
+        
+        const keyword = searchInput.value.toLowerCase().trim();
+        const checkboxes = document.querySelectorAll('#albumCheckboxes input[type="checkbox"]');
+        const labels = document.querySelectorAll('#albumCheckboxes label');
+        
+        checkboxes.forEach((checkbox, index) => {
+            const label = labels[index];
+            const albumName = checkbox.value.toLowerCase();
+            const shouldShow = albumName.includes(keyword);
+            
+            // 使用 display 而不是 visibility 以保持布局紧凑
+            checkbox.style.display = shouldShow ? '' : 'none';
+            if (label) {
+                label.style.display = shouldShow ? '' : 'none';
+            }
+            // 隐藏换行符
+            const br = label?.nextElementSibling;
+            if (br && br.tagName === 'BR') {
+                br.style.display = shouldShow ? '' : 'none';
+            }
+        });
+    },
+
+    toggleClearButton() {
+        const searchInput = document.getElementById('albumSearchInput');
+        const clearButton = document.getElementById('clearAlbumSearch');
+        if (searchInput && clearButton) {
+            clearButton.style.display = searchInput.value ? 'block' : 'none';
+        }
+    },
+
+    clearAlbumSearch() {
+        const searchInput = document.getElementById('albumSearchInput');
+        if (searchInput) {
+            searchInput.value = '';
+            this.filterAlbumList();
+            this.toggleClearButton();
+        }
+    },
+
+    toggleKeywordClearButton() {
+        const searchInput = document.getElementById('keywordInput');
+        const clearButton = document.getElementById('clearKeywordSearch');
+        if (searchInput && clearButton) {
+            clearButton.style.display = searchInput.value ? 'block' : 'none';
+        }
+    },
+
+    clearKeywordSearch() {
+        const searchInput = document.getElementById('keywordInput');
+        if (searchInput) {
+            searchInput.value = '';
+            this.search();
+            this.toggleKeywordClearButton();
         }
     }
 };

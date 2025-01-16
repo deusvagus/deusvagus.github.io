@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GI HSR Music Database V5.3.0</title>
+    <title>GI HSR Music Database V5.3.1</title>
     <link rel="stylesheet" href="css/styles.css">
     <style>
         /* 字体大小类 */
@@ -49,6 +49,128 @@
             -moz-user-select: text;
             -ms-user-select: text;
         }
+
+        /* 专辑搜索框样式 */
+        .album-search {
+            margin-bottom: 10px;
+            padding: 0 10px;
+        }
+        
+        .album-search input {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        /* 深色主题适配 */
+        body:not(.light-mode) .album-search input {
+            background-color: #333;
+            color: #fff;
+            border-color: #555;
+        }
+
+        /* 修改搜索框容器样式 */
+        .search-input-container {
+            position: relative;
+            width: 100%;
+            height: 28px;  /* 固定容器高度 */
+        }
+
+        .search-input-container input {
+            width: 100%;
+            padding: 5px 25px 5px 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            height: 28px;
+            box-sizing: border-box;
+        }
+
+        .clear-search {
+            position: absolute;
+            right: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 16px;
+            width: 16px;
+            height: 16px;
+            padding: 0;
+            display: none;
+            text-align: center;
+            line-height: 16px;
+        }
+
+        .clear-search:hover {
+            color: #666;
+        }
+
+        /* 深色主题适配 */
+        body:not(.light-mode) .clear-search {
+            color: #888;
+        }
+
+        body:not(.light-mode) .clear-search:hover {
+            color: #aaa;
+        }
+
+        /* 确保输入框有足够的右侧padding */
+        #keywordInput,
+        #albumSearchInput {
+            padding-right: 25px !important;
+        }
+
+        /* 修改搜索控件样式 */
+        .search-controls .search-input-container {
+            display: inline-block;
+            width: auto;
+            vertical-align: middle;
+            margin: 0 5px;
+        }
+
+        .search-controls input {
+            width: auto;  /* 恢复原有宽度 */
+        }
+
+        /* 只保留清空按钮的样式，移除其他搜索框相关样式 */
+        .search-controls .clear-search {
+            position: absolute;
+            right: 6px;
+            top: 0;
+            bottom: 0;
+            margin: auto;
+            width: 16px;
+            height: 16px;
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 0;
+            display: none;
+            line-height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-controls .clear-search:hover {
+            color: #666;
+        }
+
+        /* 深色主题适配 */
+        body:not(.light-mode) .search-controls .clear-search {
+            color: #888;
+        }
+
+        body:not(.light-mode) .search-controls .clear-search:hover {
+            color: #aaa;
+        }
     </style>
 </head>
 
@@ -66,6 +188,12 @@
                 <!-- <input type="file" id="fileInput"> -->
                 <div id="albumList" class="album-list">
                     <h3>专辑列表</h3>
+                    <div class="album-search">
+                        <div class="search-input-container">
+                            <input type="text" id="albumSearchInput" placeholder="搜索专辑...">
+                            <button id="clearAlbumSearch" class="clear-search" title="清空搜索">&times;</button>
+                        </div>
+                    </div>
                     <div class="album-controls">
                         <button id="selectAllAlbums">全选</button>
                         <button id="deselectAllAlbums">全不选</button>
@@ -87,7 +215,10 @@
                         <button id="composerSearch" class="toggle-button">作曲</button>
                         <button id="arrangerSearch" class="toggle-button">编曲</button>
                         <button id="otherSearch" class="toggle-button">其他</button>
-                        <input type="text" id="keywordInput" placeholder="请输入关键字">
+                        <div style="position: relative; display: inline-block;">
+                            <input type="text" id="keywordInput" placeholder="请输入关键字" style="padding-right: 25px;">
+                            <button id="clearKeywordSearch" class="clear-search" title="清空搜索">&times;</button>
+                        </div>
                         <button id="searchButton">搜索</button>
                     </div>
                     <div class="checkbox-group">
