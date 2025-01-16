@@ -4,7 +4,7 @@ const App = {
     currentPage: 1,
     itemsPerPage: 1000,
     searchType: 'all',
-    customPath: localStorage.getItem('customPath') || 'music_database_V5.2.2.json',
+    customPath: localStorage.getItem('customPath') || 'music_database_V5.3.0.json',
     selectedAlbums : [],
 
     init() {
@@ -13,15 +13,11 @@ const App = {
             ThemeModule.init();
         }
         this.addEventListenerSafely('fileInput', 'change', this.handleFileUpload.bind(this));
-        // this.loadData();
         this.loadCustomFile();
         this.loadSettings();
         this.initScrollToTop();
         this.initScrollToBottom();
         MobileUI.init();
-        SpecialCollectionHandler.loadCollections('path/to/special_collections.json');
-        this.addEventListenerSafely('specialCollectionSelect', 'change', this.handleSpecialCollectionChange.bind(this));
-        this.addEventListenerSafely('loadCustomPathsBtn', 'click', this.loadCustomPaths.bind(this));
     },
     
     bindEvents() {
@@ -29,7 +25,6 @@ const App = {
         this.addEventListenerSafely('reloadDataBtn', 'click', this.loadCustomFile.bind(this));
         this.addEventListenerSafely('genshinPath', 'change', this.updatePath.bind(this, 'genshinPath'));
         this.addEventListenerSafely('starRailPath', 'change', this.updatePath.bind(this, 'starRailPath'));
-        this.addEventListenerSafely('specialCollectionPath', 'change', this.updatePath.bind(this, 'specialCollectionPath'));
         
         this.addEventListenerSafely('selectGenshinAlbums', 'click', this.selectGenshinAlbums.bind(this));
         this.addEventListenerSafely('selectStarRailAlbums', 'click', this.selectStarRailAlbums.bind(this));
@@ -40,10 +35,6 @@ const App = {
         
         ['all', 'title', 'composer', 'arranger', 'other'].forEach(type => {
             this.addEventListenerSafely(`${type}Search`, 'click', () => this.toggleSearchType(type));
-        });
-
-        ['composer', 'arranger', 'other'].forEach(type => {
-            this.addEventListenerSafely(`${type}Checkbox`, 'change', this.search.bind(this));
         });
 
         this.addEventListenerSafely('selectAllAlbums', 'click', this.selectAllAlbums.bind(this));
@@ -61,6 +52,11 @@ const App = {
         this.addEventListenerSafely('scrollToTopBtn', 'click', this.scrollToTop);
 
         document.getElementById('results').addEventListener('click', this.handleResultsClick.bind(this));
+
+        // 恢复显示设置的事件监听
+        ['composer', 'arranger', 'other'].forEach(type => {
+            this.addEventListenerSafely(`${type}Checkbox`, 'change', this.search.bind(this));
+        });
     },
 
     addEventListenerSafely(id, event, handler) {
@@ -72,70 +68,6 @@ const App = {
         }
     },
     
-    loadData() {
-        const genshinPath = '';
-        const starRailPath = '';
-        const specialCollectionPath = '';
-    
-        const loadPromises = [];
-    
-        const fetchData = (path) => {
-            return fetch(path)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('File not found');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    this.albums = FileHandler.processData(data);
-                    this.setLoadMessage('test file loaded successfully');
-                    this.populateAlbumList();
-                    this.search();
-                })
-                .catch(error => {
-                    console.error(`Error fetching ${path}:`, error);
-                    return [];  // 返回空数组，以便继续处理
-                });
-        };
-    
-        if (document.getElementById('loadGenshin').checked) {
-            loadPromises.push(fetchData(genshinPath));
-        } else {
-            loadPromises.push(Promise.resolve([]));
-        }
-    
-        if (document.getElementById('loadStarRail').checked) {
-            loadPromises.push(fetchData(starRailPath));
-        } else {
-            loadPromises.push(Promise.resolve([]));
-        }
-    
-        if (document.getElementById('loadSpecialCollection').checked) {
-            loadPromises.push(fetchData(specialCollectionPath).then(data => {
-                SpecialCollectionHandler.collections = data;
-                return data;
-            }));
-        } else {
-            loadPromises.push(Promise.resolve({}));
-        }
-    
-        Promise.all(loadPromises)
-            .then(([genshinData, starRailData, specialCollections]) => {
-                this.albums = [...genshinData, ...starRailData];
-                this.setLoadMessage('选中的文件加载成功');
-                this.populateAlbumList();
-                // this.populateSpecialCollectionSelect();
-                this.search();
-            })
-            .catch(error => {
-                console.error('Error loading files:', error);
-                this.setLoadMessage('文件加载失败：' + error.message);
-            });
-    
-        this.saveSettings();
-    },
-    
     loadCustomFile() {
         fetch(this.customPath)
             .then(response => {
@@ -145,29 +77,22 @@ const App = {
                 return response.json();
             })
             .then(data => {
+                // 确保数据被正确处理和加载
                 this.albums = FileHandler.processData(data);
-                this.setLoadMessage('test file loaded successfully');
-                this.populateAlbumList();
-                this.search();
+                this.setLoadMessage('数据加载成功');
+                
+                // 使用 setTimeout 确保 DOM 完全加载
+                setTimeout(() => {
+                    this.populateAlbumList();
+                    this.search(); // 初始化搜索显示所有结果
+                }, 0);
             })
             .catch(error => {
-                console.error('Auto-load file error:', error);
-                this.setLoadMessage('test file not found');
+                console.error('数据加载错误:', error);
+                this.setLoadMessage('数据加载失败：' + error.message);
             });
     },
 
-    populateSpecialCollectionSelect() {
-        const select = document.getElementById('specialCollectionSelect');
-        select.innerHTML = '<option value="">无</option>';
-        Object.keys(SpecialCollectionHandler.collections).forEach(key => {
-            const option = document.createElement('option');
-            option.value = key;
-            option.textContent = key;
-            select.appendChild(option);
-        });
-    },
-    
-    
     loadJSON(path) {
         return fetch(path).then(response => response.json());
     },
@@ -318,26 +243,34 @@ const App = {
             console.log('No albums loaded yet');
             return;
         }
-        const keyword = document.getElementById('keywordInput').value.trim();
-        const filters = {
-            composerChecked: document.getElementById('composerCheckbox').checked,
-            arrangerChecked: document.getElementById('arrangerCheckbox').checked,
-            otherChecked: document.getElementById('otherCheckbox').checked
-        };
-    
-        // 获取选中的专辑
-        const selectedAlbums = Array.from(document.querySelectorAll('#albumCheckboxes input:checked'))
-            .map(checkbox => checkbox.value);
-    
-        // 执行基本搜索
-        this.searchResults = SearchModule.search(this.albums, keyword, this.searchType, filters, selectedAlbums);
-    
-        // 应用特别收录过滤
-        const specialCollection = document.getElementById('specialCollectionSelect').value;
-        if (specialCollection) {
-            this.searchResults = SpecialCollectionHandler.filterResults(this.searchResults, specialCollection);
+
+        // 获取必要的 DOM 元素，添加错误检查
+        const keywordInput = document.getElementById('keywordInput');
+        const composerCheckbox = document.getElementById('composerCheckbox');
+        const arrangerCheckbox = document.getElementById('arrangerCheckbox');
+        const otherCheckbox = document.getElementById('otherCheckbox');
+
+        // 如果必要的元素不存在，提前返回
+        if (!keywordInput || !composerCheckbox || !arrangerCheckbox || !otherCheckbox) {
+            console.error('搜索所需的DOM元素未找到');
+            return;
         }
-    
+
+        const keyword = keywordInput.value.trim();
+        
+        const filters = {
+            composerChecked: composerCheckbox.checked,
+            arrangerChecked: arrangerCheckbox.checked,
+            otherChecked: otherCheckbox.checked
+        };
+        
+        const albumCheckboxes = document.querySelectorAll('#albumCheckboxes input:checked');
+        const selectedAlbums = albumCheckboxes ? 
+            Array.from(albumCheckboxes).map(checkbox => checkbox.value) : 
+            [];
+        
+        this.searchResults = SearchModule.search(this.albums, keyword, this.searchType, filters, selectedAlbums);
+
         this.currentPage = 1;
         this.displayResults();
     },
@@ -451,13 +384,6 @@ const App = {
                 document.getElementById('sidebarWidthInput').value = sidebarWidth;
             }
         }
-        ['Genshin', 'StarRail', 'SpecialCollection'].forEach(fileType => {
-            const checkbox = document.getElementById(`load${fileType}`);
-            if (checkbox) {
-                const savedState = localStorage.getItem(`load${fileType}`);
-                checkbox.checked = savedState === null ? true : (savedState === 'true');
-            }
-        });
     },
     saveSettings() {
         // ... 其他设置保存代码 ...
@@ -570,9 +496,6 @@ const App = {
         checkboxes.forEach(checkbox => {
             checkbox.checked = checkbox.value.includes(keyword);
         });
-        this.search();
-    },
-    handleSpecialCollectionChange() {
         this.search();
     },
     updatePath(pathType, event) {
