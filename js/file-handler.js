@@ -1,32 +1,47 @@
 const FileHandler = {
     async loadAllDataFiles() {
         try {
-            // 預定義的資料夾列表
-            const folders = [
-                'data/原神',
-                'data/星穹铁道'
-            ];
+            // 首先加載 data.json 來獲取文件列表
+            const response = await fetch('data/data.json');
+            if (!response.ok) {
+                throw new Error('Failed to load data.json');
+            }
+            const fileList = await response.json();
 
-            const dataPromises = folders.map(folder => 
-                fetch(folder)
-                    .then(response => response.text())
-                    .then(text => {
-                        const parser = new DOMParser();
-                        const html = parser.parseFromString(text, 'text/html');
-                        return Array.from(html.querySelectorAll('a'))
-                            .map(a => a.href)
-                            .filter(href => href.endsWith('.json'))
-                            .map(file => fetch(file).then(response => response.json()));
+            // 收集所有需要加載的文件
+            const allFiles = [];
+            for (const [folder, files] of Object.entries(fileList)) {
+                allFiles.push(...files.map(file => `data/${file.replace('.json', '_data.json')}`));
+            }
+
+            console.log('Attempting to load files:', allFiles);
+
+            // 加載所有文件
+            const dataPromises = allFiles.map(file => 
+                fetch(file)
+                    .then(response => {
+                        if (!response.ok) {
+                            console.warn(`File not found: ${file}`);
+                            return null;
+                        }
+                        return response.json();
                     })
                     .catch(error => {
-                        console.error(`Error scanning folder ${folder}:`, error);
-                        return [];
+                        console.error(`Error loading ${file}:`, error);
+                        return null;
                     })
             );
 
-            const folderResults = await Promise.all(dataPromises);
-            const allData = await Promise.all(folderResults.flat());
-            return allData.filter(data => data !== null);
+            const allData = await Promise.all(dataPromises);
+            const validData = allData.filter(data => data !== null);
+            
+            if (validData.length === 0) {
+                console.error('No valid data files found');
+                return [];
+            }
+
+            console.log(`Successfully loaded ${validData.length} files`);
+            return validData;
         } catch (error) {
             console.error('Error loading data files:', error);
             return [];
