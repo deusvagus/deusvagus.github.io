@@ -1,18 +1,70 @@
 const FileHandler = {
-    loadFile(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = e => {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    resolve(data);
-                } catch (error) {
-                    reject(new Error('Invalid JSON file'));
+    async loadAllDataFiles() {
+        try {
+            // 預定義的資料夾列表
+            const folders = [
+                'data/原神',
+                'data/星穹铁道'
+            ];
+
+            const dataPromises = folders.map(folder => 
+                fetch(folder)
+                    .then(response => response.text())
+                    .then(text => {
+                        const parser = new DOMParser();
+                        const html = parser.parseFromString(text, 'text/html');
+                        return Array.from(html.querySelectorAll('a'))
+                            .map(a => a.href)
+                            .filter(href => href.endsWith('.json'))
+                            .map(file => fetch(file).then(response => response.json()));
+                    })
+                    .catch(error => {
+                        console.error(`Error scanning folder ${folder}:`, error);
+                        return [];
+                    })
+            );
+
+            const folderResults = await Promise.all(dataPromises);
+            const allData = await Promise.all(folderResults.flat());
+            return allData.filter(data => data !== null);
+        } catch (error) {
+            console.error('Error loading data files:', error);
+            return [];
+        }
+    },
+
+    async scanDirectory(path) {
+        try {
+            const response = await fetch(path);
+            const text = await response.text();
+            const parser = new DOMParser();
+            const html = parser.parseFromString(text, 'text/html');
+            const links = Array.from(html.querySelectorAll('a'))
+                .map(a => a.href)
+                .filter(href => href.startsWith(path));
+
+            const files = [];
+            const subDirs = [];
+
+            for (const link of links) {
+                if (link.endsWith('.json')) {
+                    files.push(link);
+                } else if (!link.endsWith('/')) {
+                    subDirs.push(link);
                 }
-            };
-            reader.onerror = () => reject(new Error('Error reading file'));
-            reader.readAsText(file);
-        });
+            }
+
+            // 遞歸掃描子資料夾
+            for (const dir of subDirs) {
+                const subFiles = await this.scanDirectory(dir);
+                files.push(...subFiles);
+            }
+
+            return files;
+        } catch (error) {
+            console.error(`Error scanning directory ${path}:`, error);
+            return [];
+        }
     },
 
     processData(albums) {

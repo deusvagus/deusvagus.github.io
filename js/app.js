@@ -88,28 +88,30 @@ const App = {
     },
     
     loadCustomFile() {
-        fetch(this.customPath)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('File not found');
-                }
-                return response.json();
-            })
-            .then(data => {
-                // 确保数据被正确处理和加载
-                this.albums = FileHandler.processData(data);
-                this.setLoadMessage('数据加载成功');
+        FileHandler.loadAllDataFiles()
+            .then(dataArray => {
+                // 合併所有數據
+                const combinedData = dataArray.reduce((acc, data) => {
+                    if (Array.isArray(data)) {
+                        return [...acc, ...data];
+                    }
+                    return acc;
+                }, []);
                 
-                // 使用 setTimeout 确保 DOM 完全加载
+                // 確保數據被正確處理和加載
+                this.albums = FileHandler.processData(combinedData);
+                this.setLoadMessage('數據加載成功');
+                
+                // 使用 setTimeout 確保 DOM 完全加載
                 setTimeout(() => {
                     this.populateAlbumList();
-                    this.search(); // 初始化搜索显示所有结果
-                    this.toggleKeywordClearButton(); // 添加这行
+                    this.search(); // 初始化搜索顯示所有結果
+                    this.toggleKeywordClearButton();
                 }, 0);
             })
             .catch(error => {
-                console.error('数据加载错误:', error);
-                this.setLoadMessage('数据加载失败：' + error.message);
+                console.error('數據加載錯誤:', error);
+                this.setLoadMessage('數據加載失敗：' + error.message);
             });
     },
 
