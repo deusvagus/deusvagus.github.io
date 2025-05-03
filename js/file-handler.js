@@ -11,7 +11,7 @@ const FileHandler = {
             // 收集所有需要加載的文件
             const allFiles = [];
             for (const [folder, files] of Object.entries(fileList)) {
-                allFiles.push(...files.map(file => `data/${file.replace('.json', '_data.json')}`));
+                allFiles.push(...files.map(file => `data/${file}`));
             }
 
             console.log('Attempting to load files:', allFiles);
