@@ -100,9 +100,6 @@ const FileHandler = {
         for (let role in track) {
             if (role === 'track') continue;
             let name = track[role];
-            console.log("REAL ROLE:", JSON.stringify(role),
-              "CHARS:", [...role].map(c => c.charCodeAt(0).toString(16)),
-              "VALUE:", JSON.stringify(name));
             if (typeof name === 'string' && name.trim() !== '') {
                 const lowerRole = role.toLowerCase();
                 if (lowerRole.includes('作曲') || lowerRole.includes('composer')) {
