@@ -99,17 +99,21 @@ const FileHandler = {
 
         for (let role in track) {
             if (role === 'track') continue;
+            let normalizedRole = role.replace(/\s+/g, ' ').trim();
             let name = track[role];
+            console.log("REAL ROLE:", JSON.stringify(role),
+              "CHARS:", [...role].map(c => c.charCodeAt(0).toString(16)),
+              "VALUE:", JSON.stringify(name));
             if (typeof name === 'string' && name.trim() !== '') {
-                const lowerRole = role.toLowerCase();
+                const lowerRole = normalizedRole.toLowerCase();
                 if (lowerRole.includes('作曲') || lowerRole.includes('composer')) {
-                    processedTrack.composers.push({ role, name });
-                } else if (lowerRole.includes('编曲') || lowerRole.includes('arranger') || lowerRole.includes('Adoption') ||
+                    processedTrack.composers.push({ normalizedRole, name });
+                } else if (lowerRole.includes('编曲') || lowerRole.includes('arranger') || lowerRole.includes('adoption') ||
                     lowerRole.includes('orchestrator') || lowerRole.includes('配器') || lowerRole.includes('改编') ||
                     lowerRole.includes('编配')) {
-                    processedTrack.arrangers.push({ role, name });
+                    processedTrack.arrangers.push({ normalizedRole, name });
                 } else {
-                    processedTrack.others.push({ role, name });
+                    processedTrack.others.push({ normalizedRole, name });
                 }
             }
         }
