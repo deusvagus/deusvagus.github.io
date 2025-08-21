@@ -104,7 +104,7 @@ const FileHandler = {
               "CHARS:", [...role].map(c => c.charCodeAt(0).toString(16)),
               "VALUE:", JSON.stringify(name));
             if (typeof name === 'string' && name.trim() !== '') {
-                const lowerRole = normalizedRole.toLowerCase();
+                const lowerRole = role.toLowerCase();
                 if (lowerRole.includes('作曲') || lowerRole.includes('composer')) {
                     processedTrack.composers.push({ role, name });
                 } else if (lowerRole.includes('编曲') || lowerRole.includes('arranger') || lowerRole.includes('adoption') ||
