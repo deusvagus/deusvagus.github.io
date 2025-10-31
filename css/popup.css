@@ -74,86 +74,123 @@ body.light-mode .popup-container h2 {
     transform: scale(1.05);
 }
 
-/* 【修改】按鈕彈跳動畫 */
+/* 按鈕動畫 */
 .popup-container .popup-button.bouncing {
     animation: bounceEffect 0.3s ease-in-out;
 }
-
-/* 【新增】按鈕搖頭（嘲諷）動畫 */
 .popup-container .popup-button.shaking {
     animation: shakeEffect 0.5s cubic-bezier(.36,.07,.19,.97) both;
 }
 
-/* 關閉按鈕 【修改】移除絕對定位的 top/right */
+/* 關閉按鈕 */
 .popup-close-btn {
     position: absolute;
+    top: 8px;
+    right: 8px;
     background: none;
     border: none;
-    font-size: 4px;
+    font-size: 20px;
     color: #aaa;
     cursor: pointer;
-    transition: color 0.3s, transform 0.2s, top 0.2s, right 0.2s, bottom 0.2s, left 0.2s;
-    width: 10px;
-    height: 10px;
-    line-height: 10px;
+    transition: color 0.3s, transform 0.2s, opacity 0.3s, box-shadow 0.3s;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
     padding: 0;
-    /* 【移除】 top: 8px; */
-    /* 【移除】 right: 8px; */
+    opacity: 0.8;
 }
 
-/* 【新增】定義四個角落的位置 */
-.popup-close-btn.top-right { top: 8px; right: 8px; }
-.popup-close-btn.top-left { top: 8px; left: 8px; }
-.popup-close-btn.bottom-left { bottom: 8px; left: 8px; }
-.popup-close-btn.bottom-right { bottom: 8px; right: 8px; }
+/* 禁用時的樣式 */
+.popup-close-btn:disabled {
+    opacity: 0.2;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
 
+/* 解鎖後的樣式 (會發光) */
+.popup-close-btn.unlocked:not(:disabled) {
+    color: #0f0;
+    opacity: 1;
+    animation: glow 1.5s infinite alternate;
+}
 
-.popup-close-btn:hover {
+.popup-close-btn:hover:not(:disabled) {
     color: #fff;
     transform: rotate(90deg);
 }
-body.light-mode .popup-close-btn {
-    color: #888;
+
+/* 數學挑戰區域 */
+.math-challenge {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #555;
+}
+body.light-mode .math-challenge {
+    border-top: 1px solid #ccc;
 }
 
-body.light-mode .popup-close-btn:hover {
+.math-challenge p {
+    font-size: 18px;
+    font-weight: bold;
+    color: #ffc107;
+    margin: 10px 0;
+}
+
+.math-challenge input {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #777;
+    background: #222;
+    color: #fff;
+    text-align: center;
+    font-size: 16px;
+    width: 100px;
+    margin-right: 10px;
+}
+body.light-mode .math-challenge input {
+    background: #eee;
     color: #333;
+    border-color: #aaa;
 }
 
+.math-challenge button {
+    padding: 8px 15px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+.math-challenge button:hover {
+    background-color: #218838;
+}
 
+/* 動畫 */
 @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes bounceEffect {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+@keyframes shakeEffect {
+    10%, 90% { transform: translate3d(-1px, 0, 0); }
+    20%, 80% { transform: translate3d(2px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+    40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+
+@keyframes glow {
     from {
-        opacity: 0;
-        transform: scale(0.9);
+        box-shadow: 0 0 5px #0f0, 0 0 10px #0f0;
     }
     to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-/* 按鈕彈一下的 Keyframes */
-@keyframes bounceEffect {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.1);
-    }
-}
-
-/* 嘲諷 Keyframes */
-@keyframes shakeEffect {
-    10%, 90% {
-        transform: translate3d(-1px, 0, 0);
-    }
-    20%, 80% {
-        transform: translate3d(2px, 0, 0);
-    }
-    30%, 50%, 70% {
-        transform: translate3d(-4px, 0, 0);
-    }
-    40%, 60% {
-        transform: translate3d(4px, 0, 0);
+        box-shadow: 0 0 10px #0f0, 0 0 20px #0f0;
     }
 }

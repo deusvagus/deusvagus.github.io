@@ -1,17 +1,21 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- HTML 結構 (不變) ---
+    // HTML 結構
     const popupHTML = `
         <div class="popup-overlay" id="popupOverlay">
             <div class="popup-container" id="popupContainer">
                 
-                <button class="popup-close-btn" id="closeBtn1">&times;</button>
-                <button class="popup-close-btn" id="closeBtn2">&times;</button>
-                <button class="popup-close-btn" id="closeBtn3">&times;</button>
-                <button class="popup-close-btn" id="closeBtn4">&times;</button>
+                <button class="popup-close-btn" id="closePopupBtn">&times;</button>
 
-                <h2>新版已經上線了不要再用舊版了</h2>
-                <p>新版網站有更完善的搜尋功能，還整合了音樂播放器，不去的話就吃我彈窗！！！</p>
+                <h2 id="popupTitle">新版已上線</h2>
+                <p id="popupMessage">新版網站有更完善的搜尋功能，還整合了音樂播放器。</p>
+                
+                <div class="math-challenge" id="mathChallenge" style="display: none;">
+                    <p id="mathProblemText">Solve to Close:</p>
+                    <input type="text" id="mathAnswerInput" placeholder="Answer">
+                    <button id="mathSubmitBtn">Unlock</button>
+                </div>
+
                 <a href="https://deusvagus.github.io/musicplayer/" class="popup-button" id="goToNewVersionBtn">立即前往</a>
             </div>
         </div>
@@ -19,91 +23,95 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.body.insertAdjacentHTML('beforeend', popupHTML);
 
-    // --- 獲取元素 (不變) ---
+    // 獲取 DOM 元素
     const popupOverlay = document.getElementById('popupOverlay');
     const popupContainer = document.getElementById('popupContainer');
     const goToNewVersionBtn = document.getElementById('goToNewVersionBtn');
-    
-    const closeButtons = [
-        document.getElementById('closeBtn1'),
-        document.getElementById('closeBtn2'),
-        document.getElementById('closeBtn3'),
-        document.getElementById('closeBtn4')
-    ];
-    const cornerClasses = ['top-right', 'top-left', 'bottom-left', 'bottom-right'];
+    const closePopupBtn = document.getElementById('closePopupBtn');
+    const mathChallenge = document.getElementById('mathChallenge');
+    const mathProblemText = document.getElementById('mathProblemText');
+    const mathAnswerInput = document.getElementById('mathAnswerInput');
+    const mathSubmitBtn = document.getElementById('mathSubmitBtn');
+    const popupTitle = document.getElementById('popupTitle');
+    const popupMessage = document.getElementById('popupMessage');
 
-    // --- 狀態變數 (不變) ---
-    let closeClickCount = 0;
-    let realButtonIndex = 0; 
-    let isClosingLegally = false; 
+    // 狀態變數
+    let correctAnswer = 0;
+    let isClosingLegally = false;
+    let isTrapTriggered = false; 
 
-    // --- 核心功能函數 ---
+    // 核心功能函數
     const showPopup = () => {
         popupOverlay.style.display = 'flex';
-        scatterButtons(); 
+        
+        // 重置回階段一 (友善狀態)
+        isTrapTriggered = false;        
+        closePopupBtn.disabled = false; 
+        closePopupBtn.classList.remove('unlocked'); 
+        mathChallenge.style.display = 'none'; 
+        mathAnswerInput.value = '';
+        
+        popupTitle.textContent = "新版已上線";
+        popupMessage.textContent = "新版網站有更完善的搜尋功能，還整合了音樂播放器。";
     };
 
     const hidePopup = () => {
         isClosingLegally = true; 
         popupOverlay.style.display = 'none';
-        
         styleObserver.disconnect();
         bodyObserver.disconnect();
     };
 
-    // --- 【重大修改】 ---
-    // 改為在當前頁面跳轉
     const redirectToNewVersion = () => {
-        window.location.href = 'https://deusvagus.github.io/musicplayer/'; 
+        window.location.href = 'https://deusvagus.github.io/musicplayer/';
     };
-    // --- 【修改完畢】 ---
+    
+    // 產生數學題
+    function generateMathProblem() {
+        // Sigma (Σ) 部分
+        const limit = 5; 
+        const multiplier = (Math.floor(Math.random() * 5) + 1) * 5; 
+        let sigmaSum = 0;
+        for (let n = 1; n <= limit; n++) {
+            sigmaSum += (n * multiplier);
+        }
+        
+        const decimalValue = Math.floor(Math.random() * 100) + 50; 
+        const hexString = decimalValue.toString(16).toUpperCase(); 
+        
+        correctAnswer = sigmaSum + decimalValue;
+        
+        mathProblemText.textContent = `Nice try! Solve: Σ(n=1 to ${limit}) of (n*${multiplier}) + 0x${hexString} = x`;
+    }
 
-
+    // 觸發按鈕動畫 (搖頭或彈跳)
     function triggerButtonEffect(className) {
         goToNewVersionBtn.classList.remove('bouncing', 'shaking');
         void goToNewVersionBtn.offsetWidth; 
-        
         goToNewVersionBtn.classList.add(className);
         goToNewVersionBtn.addEventListener('animationend', () => {
             goToNewVersionBtn.classList.remove(className);
         }, { once: true });
     }
 
-    function scatterButtons() {
-        realButtonIndex = Math.floor(Math.random() * 4);
-        const shuffledClasses = [...cornerClasses].sort(() => Math.random() - 0.5);
-
-        closeButtons.forEach((btn, index) => {
-            btn.classList.remove(...cornerClasses);
-            btn.classList.add(shuffledClasses[index]);
-        });
-    }
-
-    function onCloseButtonClick(event, clickedIndex) {
-        event.stopPropagation(); 
-
-        if (clickedIndex === realButtonIndex) {
-            closeClickCount++;
-            triggerButtonEffect('bouncing'); 
-
-            if (closeClickCount >= 4) {
-                hidePopup(); 
-            } else {
-                scatterButtons(); 
-            }
-        } else {
-            closeClickCount = 0; 
-            triggerButtonEffect('shaking'); 
-            scatterButtons(); 
-        }
-    }
-
-    // --- 防破解 (不變) ---
+    // 防破解：監視 DOM 變動
     let styleObserver = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
-            if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
-                if (popupOverlay.style.display === 'none' && !isClosingLegally) {
-                    popupOverlay.style.display = 'flex'; 
+            if (mutation.type === 'attributes') {
+                // 防止 F12 設置 display: none
+                if (mutation.attributeName === 'style' &&
+                    popupOverlay.style.display === 'none' && !isClosingLegally) {
+                    popupOverlay.style.display = 'flex';
+                    triggerButtonEffect('shaking');
+                }
+                
+                // 防止 F12 移除 disabled 屬性
+                if (mutation.attributeName === 'disabled' &&
+                    !closePopupBtn.disabled && 
+                    isTrapTriggered &&         
+                    !closePopupBtn.classList.contains('unlocked')) 
+                {
+                    closePopupBtn.disabled = true; 
                     triggerButtonEffect('shaking'); 
                 }
             }
@@ -119,30 +127,96 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
         }
-        
+        // 防止 F12 刪除彈窗節點
         if (overlayRemoved && !isClosingLegally) {
-            document.body.insertAdjacentElement('beforeend', popupOverlay); 
-            triggerButtonEffect('shaking'); 
+            document.body.insertAdjacentElement('beforeend', popupOverlay);
+            showPopup(); 
         }
     });
 
-    // --- 綁定事件 (不變) ---
+    // 綁定事件
 
-    closeButtons.forEach((btn, index) => {
-        btn.addEventListener('click', (e) => onCloseButtonClick(e, index));
+    // 數學題提交按鈕
+    mathSubmitBtn.addEventListener('click', (event) => {
+        event.stopPropagation(); 
+        
+        const userAnswerString = mathAnswerInput.value;
+        const userAnswerNum = parseInt(userAnswerString, 10);
+
+        const _k1 = "lzrs";
+        const _k2 = "dqjdx";
+        const _key = _k1 + _k2; // "lzrsdqjdx"
+        const _f = "from" + "CharCode";
+        const _c = "char" + "CodeAt";
+        let _decryptedKey = ""; 
+
+        for (let i = 0; i < _key.length; i++) {
+            let charCode = _key[_c](i);
+            _decryptedKey += String[_f](charCode === 122 ? 97 : charCode + 1);
+        }
+        
+        if (userAnswerString === _decryptedKey || userAnswerNum === correctAnswer) {
+            
+            closePopupBtn.disabled = false; 
+            closePopupBtn.classList.add('unlocked'); 
+            mathChallenge.style.display = 'none'; 
+            
+        } else {
+            triggerButtonEffect('shaking'); 
+            mathAnswerInput.value = '';
+            mathProblemText.textContent = `WRONG! Try again: ${mathProblemText.textContent.split(': ')[1]}`;
+        }
+    });
+    
+    // 允許 Enter 鍵提交答案
+    mathAnswerInput.addEventListener('keyup', (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            mathSubmitBtn.click();
+        }
     });
 
+    // 阻止數學區塊的點擊冒泡
+    mathChallenge.addEventListener('click', (event) => {
+        event.stopPropagation();
+    });
+
+    // 關閉按鈕 (X) 
+    closePopupBtn.addEventListener('click', (event) => {
+        event.stopPropagation();
+
+        if (!isTrapTriggered) {
+            isTrapTriggered = true;
+            closePopupBtn.disabled = true; 
+            
+            popupTitle.textContent = "新版已經上線了不要再用舊版了";
+            popupMessage.textContent = "新版網站有更完善的搜尋功能，還整合了音樂播放器，不去的話就吃我彈窗！！！";
+            
+            // 顯示數學題
+            mathChallenge.style.display = 'block'; 
+            generateMathProblem(); 
+            triggerButtonEffect('shaking'); 
+            
+        } else if (!closePopupBtn.disabled) {
+            hidePopup();
+        }
+    });
+
+    // 「立即前往」按鈕
     goToNewVersionBtn.addEventListener('click', (event) => {
         event.preventDefault();
         event.stopPropagation();
         redirectToNewVersion();
     });
 
+    // 點擊容器主體 (觸發跳轉)
     popupContainer.addEventListener('click', redirectToNewVersion);
 
-    // --- 啟動 (不變) ---
+    // 啟動
     setTimeout(showPopup, 500);
     
+    // 啟動監視器
     styleObserver.observe(popupOverlay, { attributes: true });
+    styleObserver.observe(closePopupBtn, { attributes: true });
     bodyObserver.observe(document.body, { childList: true });
 });
