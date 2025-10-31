@@ -38,14 +38,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // 狀態變數
     let correctAnswer = 0;
     let isClosingLegally = false;
-    let isTrapTriggered = false; 
+    let trapState = 0; // 0 = 初始, 1 = 已變文案, 2 = 已出題目
 
     // 核心功能函數
     const showPopup = () => {
         popupOverlay.style.display = 'flex';
         
         // 重置回階段一 (友善狀態)
-        isTrapTriggered = false;        
+        trapState = 0;        
         closePopupBtn.disabled = false; 
         closePopupBtn.classList.remove('unlocked'); 
         mathChallenge.style.display = 'none'; 
@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 產生數學題
     function generateMathProblem() {
         // Sigma (Σ) 部分
-        const limit = 5; 
+        const limit = Math.floor(Math.random() * 100 + 5); 
         const multiplier = (Math.floor(Math.random() * 5) + 1) * 5; 
         let sigmaSum = 0;
         for (let n = 1; n <= limit; n++) {
@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 防止 F12 移除 disabled 屬性
                 if (mutation.attributeName === 'disabled' &&
                     !closePopupBtn.disabled && 
-                    isTrapTriggered &&         
+                    trapState === 2 && // 僅在陷阱已完全啟動時
                     !closePopupBtn.classList.contains('unlocked')) 
                 {
                     closePopupBtn.disabled = true; 
@@ -185,19 +185,22 @@ document.addEventListener('DOMContentLoaded', () => {
     closePopupBtn.addEventListener('click', (event) => {
         event.stopPropagation();
 
-        if (!isTrapTriggered) {
-            isTrapTriggered = true;
-            closePopupBtn.disabled = true; 
-            
+        if (trapState === 0) {
+            // 階段一：僅變更文案
+            trapState = 1;
             popupTitle.textContent = "新版已經上線了不要再用舊版了";
             popupMessage.textContent = "新版網站有更完善的搜尋功能，還整合了音樂播放器，不去的話就吃我彈窗！！！";
-            
-            // 顯示數學題
-            mathChallenge.style.display = 'block'; 
-            generateMathProblem(); 
             triggerButtonEffect('shaking'); 
             
-        } else if (!closePopupBtn.disabled) {
+        } else if (trapState === 1) {
+            // 階段二：顯示題目並鎖定
+            trapState = 2;
+            closePopupBtn.disabled = true; 
+            mathChallenge.style.display = 'block'; 
+            generateMathProblem(); 
+            
+        } else if (trapState === 2 && !closePopupBtn.disabled) {
+            // 階段三：(解鎖後) 合法關閉
             hidePopup();
         }
     });

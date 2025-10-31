@@ -1,0 +1,94 @@
+/* 廣告彈窗背景 */
+.ad-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.75);
+    display: none; /* 預設隱藏 */
+    justify-content: center;
+    align-items: center;
+    z-index: 2000; /* 確保在最上層 */
+}
+
+/* 廣告彈窗容器 */
+.ad-container {
+    background-color: #3a3a3a;
+    color: #f0f0f0;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    max-width: 500px;
+    width: 90%;
+    border: 1px solid #555;
+    position: relative;
+    animation: fadeIn 0.3s ease-in-out; /* 沿用您 popup.js 的動畫 */
+}
+
+.ad-container h2 {
+    margin-top: 0;
+    font-size: 24px;
+    color: #ffc107; /* 醒目的黃色 */
+}
+
+.ad-container p {
+    margin: 15px 0;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+/* 倒數計時 */
+.ad-countdown {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #aaa;
+}
+
+/* 關閉按鈕 (一開始隱藏) */
+.ad-close-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #aaa;
+    cursor: pointer;
+    transition: color 0.3s;
+    display: none; /* 關鍵：預設隱藏 */
+    padding: 5px;
+    line-height: 1;
+}
+
+.ad-close-btn:hover {
+    color: #fff;
+}
+
+/* 淺色主題 */
+body.light-mode .ad-container {
+    background-color: #ffffff;
+    color: #333333;
+    border: 1px solid #ccc;
+}
+
+body.light-mode .ad-close-btn {
+    color: #888;
+}
+
+body.light-mode .ad-close-btn:hover {
+    color: #333;
+}
+
+/* 沿用您 popup.js 的動畫 Keyframes */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}

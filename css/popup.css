@@ -137,6 +137,7 @@ body.light-mode .math-challenge {
     margin: 10px 0;
 }
 
+/* --- 【CSS 修改處】 --- */
 .math-challenge input {
     padding: 8px;
     border-radius: 4px;
@@ -145,8 +146,9 @@ body.light-mode .math-challenge {
     color: #fff;
     text-align: center;
     font-size: 16px;
-    width: 100px;
-    margin-right: 10px;
+    width: 80%; /* 修改 */
+    display: block; /* 新增 */
+    margin: 10px auto; /* 修改 */
 }
 body.light-mode .math-challenge input {
     background: #eee;
@@ -163,7 +165,12 @@ body.light-mode .math-challenge input {
     cursor: pointer;
     font-size: 16px;
     transition: background-color 0.3s;
+    width: 80%; /* 新增 */
+    display: block; /* 新增 */
+    margin: 10px auto; /* 新增 */
 }
+/* --- 【CSS 修改結束】 --- */
+
 .math-challenge button:hover {
     background-color: #218838;
 }

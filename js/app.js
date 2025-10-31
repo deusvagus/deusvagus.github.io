@@ -19,6 +19,9 @@ const App = {
         this.initScrollToTop();
         this.initScrollToBottom();
         MobileUI.init();
+        setInterval(() => {
+            AdPopupModule.show();
+        }, 180000);
     },
     
     bindEvents() {
