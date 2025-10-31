@@ -74,20 +74,25 @@ body.light-mode .popup-container h2 {
     transform: scale(1.05);
 }
 
-/* 關閉按鈕 */
+/* 【新增】按鈕彈跳動畫 */
+.popup-container .popup-button.bouncing {
+    animation: bounceEffect 0.3s ease-in-out;
+}
+
+/* 關閉按鈕 【修改】尺寸變更 */
 .popup-close-btn {
     position: absolute;
     top: 8px;
     right: 8px;
     background: none;
     border: none;
-    font-size: 6px;
+    font-size: 4px;  /* 變更 */
     color: #aaa;
     cursor: pointer;
-    transition: color 0.3s, transform 0.2s;
-    width: 12px;
-    height: 12px;
-    line-height: 12px;
+    transition: color 0.3s, transform 0.2s, top 0.2s, right 0.2s, bottom 0.2s, left 0.2s; /* 新增 transition */
+    width: 10px;     /* 變更 */
+    height: 10px;    /* 變更 */
+    line-height: 10px; /* 變更 */
     padding: 0;
 }
 
@@ -112,5 +117,15 @@ body.light-mode .popup-close-btn:hover {
     to {
         opacity: 1;
         transform: scale(1);
+    }
+}
+
+/* 【新增】按鈕彈一下的 Keyframes */
+@keyframes bounceEffect {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
     }
 }
